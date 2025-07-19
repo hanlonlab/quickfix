@@ -11,13 +11,21 @@
   </message>
   <message name='ExecutionReport' msgtype='8' msgcat='app'>
    <field name='OrderID' required='Y' />
+   <field name='SecondaryOrderID' required='N' />
    <component name='Parties' required='N' />
+   <field name='ExecID' required='Y' />
+   <field name='ExecType' required='Y' />
    <field name='OrdStatus' required='Y' />
    <component name='Instrument' required='Y' />
    <field name='Side' required='Y' />
    <field name='OrdType' required='N' />
+   <field name='Price' required='N' />
+   <field name='EffectiveTime' required='N' />
+   <field name='LastMkt' required='N' />
    <field name='LeavesQty' required='Y' />
    <field name='CumQty' required='Y' />
+   <field name='TransactTime' required='N' />
+   <component name='TrdRegTimestamps' required='N' />
   </message>
   <message name='News' msgtype='B' msgcat='app'>
    <field name='Headline' required='Y' />
@@ -175,7 +183,6 @@
   </component>
   <component name='OrderQtyData'>
    <field name='OrderQty' required='N' />
-   <field name='OrderQty2' required='N' />
   </component>
   <component name='PegInstructions'>
    <field name='PegOffsetValue' required='N' />
