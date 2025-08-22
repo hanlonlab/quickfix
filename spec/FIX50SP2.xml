@@ -70,7 +70,6 @@
   </message>
   <message name='MarketDataSnapshotFullRefresh' msgtype='W' msgcat='app'>
    <component name='Instrument' required='Y' />
-   <field name='LastUpdateTime' required='Y' />
    <component name='MDFullGrp' required='Y' />
   </message>
   <message name='MarketDataIncrementalRefresh' msgtype='X' msgcat='app'>
