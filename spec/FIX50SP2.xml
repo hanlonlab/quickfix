@@ -127,6 +127,23 @@
    <field name='UserStatus' required='N' />
    <field name='UserStatusText' required='N' />
   </message>
+  <message name='AMMRequest' msgtype='AREQ' msgcat='app'>
+   <field name='PartyID' required='Y' />
+   <field name='ClOrdID' required='Y' />
+   <field name='AMMName' required='Y' />
+   <field name='AMMPool' required='Y' />
+   <field name='AMMOrderType' required='Y' />
+   <field name='AMMIsQuote' required='Y' />
+   <component name='AMMInput' required='Y' />
+   <component name='AMMOutputRequest' required='Y' />
+  </message>
+  <message name='AMMResponse' msgtype='ARSP' msgcat='app'>
+   <field name='PartyID' required='N' />
+   <field name='ClOrdID' required='Y' />
+   <field name='OrdStatus' required='Y' />
+   <component name='AMMOutput' required='Y' />
+   <component name='AMMReserves' required='Y' />
+  </message>
  </messages>
  <trailer />
  <components>
@@ -2441,6 +2458,8 @@
    <value enum='EB' description='PAY_MANAGEMENT_REPORT_ACK' />
    <value enum='DY' description='PAY_MANAGEMENT_REQUEST' />
    <value enum='DZ' description='PAY_MANAGEMENT_REQUEST_ACK' />
+   <value enum='AREQ' description='AMMREQUEST' />
+   <value enum='ARSP' description='AMMRESPONSE' />
   </field>
   <field number='36' name='NewSeqNo' type='SEQNUM' />
   <field number='37' name='OrderID' type='STRING' />
@@ -14363,5 +14382,23 @@
    <value enum='2' description='CANCEL_PASSIVE' />
    <value enum='3' description='CANCEL_AGGRESSIVE_PASSIVE' />
   </field>
+  <field number='2965' name='AMMName' type='STRING' />
+  <field number='2966' name='AMMPool' type='STRING' />
+  <field number='2967' name='AMMOrderType' type='INT'>
+   <value enum='0' description='CONST' />
+   <value enum='1' description='SWAP' />
+   <value enum='2' description='MINT' />
+   <value enum='3' description='BURN' />
+  </field>
+  <field number='2968' name='AMMIsQuote' type='BOOLEAN'>
+   <value enum='N' description='EXECUTE' />
+   <value enum='Y' description='QUOTE' />
+  </field>
+  <field number='2969' name='TokenName' type='STRING' />
+  <field number='2970' name='TokenQty' type='QTY' />
+  <field number='2971' name='AMMInputLen' type='NUMINGROUP' />
+  <field number='2972' name='AMMOutputRequestLen' type='NUMINGROUP' />
+  <field number='2973' name='AMMOutputLen' type='NUMINGROUP' />
+  <field number='2974' name='AMMReservesLen' type='NUMINGROUP' />
  </fields>
 </fix>
