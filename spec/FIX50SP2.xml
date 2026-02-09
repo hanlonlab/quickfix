@@ -186,6 +186,7 @@
   </component>
   <component name='Instrument'>
    <field name='Symbol' required='N' />
+   <field name='SecurityType' required='N' />
   </component>
   <component name='InstrumentExtension'>
    <field name='DeliveryForm' required='N' />
@@ -2115,6 +2116,29 @@
     <field name='RefApplExtID' required='N' />
     <field name='RefCstmApplVerID' required='N' />
     <field name='DefaultVerIndicator' required='N' />
+   </group>
+  </component>
+  <component name='AMMInput'>
+   <group name='AMMInputLen' required='Y'>
+    <field name='TokenName' required='Y' />
+    <field name='TokenQty' required='Y' />
+   </group>
+  </component>
+  <component name='AMMOutputRequest'>
+   <group name='AMMOutputRequestLen' required='Y'>
+    <field name='TokenName' required='Y' />
+   </group>
+  </component>
+  <component name='AMMOutput'>
+   <group name='AMMOutputLen' required='Y'>
+    <field name='TokenName' required='Y' />
+    <field name='TokenQty' required='Y' />
+   </group>
+  </component>
+  <component name='AMMReserves'>
+   <group name='AMMReservesLen' required='Y'>
+    <field name='TokenName' required='Y' />
+    <field name='TokenQty' required='Y' />
    </group>
   </component>
  </components>
