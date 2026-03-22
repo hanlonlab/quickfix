@@ -17,6 +17,7 @@
 **
 ****************************************************************************/
 
+#include "SessionSettings.h"
 #ifdef _MSC_VER
 #include "stdafx.h"
 #else
@@ -30,6 +31,9 @@
 #include <fstream>
 #include <inttypes.h>
 #include <sys/stat.h>
+#ifndef _MSC_VER
+#include <unistd.h>
+#endif
 
 namespace {
 auto const seqNumFileFormat = "%" + std::to_string(std::numeric_limits<uint64_t>::digits10 + 1) + "."
@@ -40,12 +44,13 @@ auto const seqNumPairFileFormat = (seqNumFileFormat + " : " + seqNumFileFormat);
 auto constexpr sizeOf64BitSeqNumFile = 43;
 } // namespace
 namespace FIX {
-FileStore::FileStore(const UtcTimeStamp &now, std::string path, const SessionID &sessionID)
+FileStore::FileStore(const UtcTimeStamp &now, std::string path, const SessionID &sessionID, std::size_t cacheLimit)
     : m_cache(now),
       m_msgFile(0),
       m_headerFile(0),
       m_seqNumsFile(0),
-      m_sessionFile(0) {
+      m_sessionFile(0),
+      m_cacheLimit(cacheLimit) {
   file_mkdir(path.c_str());
 
   if (path.empty()) {
@@ -168,10 +173,10 @@ void FileStore::populateCache() {
   FILE *headerFile = file_fopen(m_headerFileName.c_str(), "r+");
   if (headerFile) {
     SEQNUM msgSeqNum;
-    long offset;
+    off_t offset;
     std::size_t size;
 
-    while (FILE_FSCANF(headerFile, "%" SCNu64 ",%ld,%zu ", &msgSeqNum, &offset, &size) == 3) {
+    while (FILE_FSCANF(headerFile, "%" SCNu64 ",%lld,%zu ", &msgSeqNum, (long long *)&offset, &size) == 3) {
       std::pair<NumToOffset::iterator, bool> it
           = m_offsets.insert(NumToOffset::value_type(msgSeqNum, std::make_pair(offset, size)));
 
@@ -218,34 +223,45 @@ void FileStore::populateCache() {
   }
 }
 
+std::size_t FileStoreFactory::getCacheLimit(const FIX::SessionID &sessionID) const {
+  try {
+    std::string cacheLimit;
+    Dictionary settings = m_settings.get(sessionID);
+    cacheLimit = settings.getString(FILE_STORE_MAX_CACHED_MESSAGES);
+    return std::stoul(cacheLimit);
+  } catch (...) {
+    return 0;
+  }
+}
+
 MessageStore *FileStoreFactory::create(const UtcTimeStamp &now, const SessionID &sessionID) {
   if (m_path.size()) {
-    return new FileStore(now, m_path, sessionID);
+    return new FileStore(now, m_path, sessionID, m_cacheLimit);
   }
 
   std::string path;
+  std::size_t cacheLimit;
   Dictionary settings = m_settings.get(sessionID);
   path = settings.getString(FILE_STORE_PATH);
-  return new FileStore(now, path, sessionID);
+  cacheLimit = getCacheLimit(sessionID);
+  return new FileStore(now, path, sessionID, cacheLimit);
 }
 
-void FileStoreFactory::destroy(MessageStore *pStore) { delete pStore; }
-
 bool FileStore::set(SEQNUM msgSeqNum, const std::string &msg) EXCEPT(IOException) {
-  if (fseek(m_msgFile, 0, SEEK_END)) {
+  if (fseeko(m_msgFile, 0, SEEK_END)) {
     throw IOException("Cannot seek to end of " + m_msgFileName);
   }
-  if (fseek(m_headerFile, 0, SEEK_END)) {
+  if (fseeko(m_headerFile, 0, SEEK_END)) {
     throw IOException("Cannot seek to end of " + m_headerFileName);
   }
 
-  long offset = ftell(m_msgFile);
+  off_t offset = ftello(m_msgFile);
   if (offset < 0) {
     throw IOException("Unable to get file pointer position from " + m_msgFileName);
   }
   std::size_t size = msg.size();
 
-  if (fprintf(m_headerFile, "%" SCNu64 ",%ld,%zu ", msgSeqNum, offset, size) < 0) {
+  if (fprintf(m_headerFile, "%" SCNu64 ",%lld,%zu ", msgSeqNum, (long long)offset, size) < 0) {
     throw IOException("Unable to write to file " + m_headerFileName);
   }
   std::pair<NumToOffset::iterator, bool> it
@@ -253,6 +269,9 @@ bool FileStore::set(SEQNUM msgSeqNum, const std::string &msg) EXCEPT(IOException
   if (it.second == false) {
     it.first->second = std::make_pair(offset, size);
   }
+
+  enforCacheLimit();
+
   fwrite(msg.c_str(), sizeof(char), msg.size(), m_msgFile);
   if (ferror(m_msgFile)) {
     throw IOException("Unable to write to file " + m_msgFileName);
@@ -347,11 +366,36 @@ void FileStore::setSession() {
 
 bool FileStore::get(SEQNUM msgSeqNum, std::string &msg) const EXCEPT(IOException) {
   NumToOffset::const_iterator find = m_offsets.find(msgSeqNum);
-  if (find == m_offsets.end()) {
-    return false;
+  OffsetSize offset;
+
+  if (find != m_offsets.end()) {
+    offset = find->second;
+  } else {
+    FILE *headerFile = file_fopen(m_headerFileName.c_str(), "r");
+    if (!headerFile) {
+      return false;
+    }
+
+    SEQNUM seqNum;
+    off_t f_offset;
+    std::size_t size;
+    bool found = false;
+
+    while (FILE_FSCANF(headerFile, "%" SCNu64 ",%lld,%zu ", &seqNum, (long long *)&f_offset, &size) == 3) {
+      if (seqNum == msgSeqNum) {
+        offset = std::make_pair(f_offset, size);
+        found = true;
+        break;
+      }
+    }
+    fclose(headerFile);
+
+    if (!found) {
+      return false;
+    }
   }
-  const OffsetSize &offset = find->second;
-  if (fseek(m_msgFile, offset.first, SEEK_SET)) {
+
+  if (fseeko(m_msgFile, offset.first, SEEK_SET)) {
     throw IOException("Unable to seek in file " + m_msgFileName);
   }
   char *buffer = new char[offset.second + 1];
@@ -364,6 +408,17 @@ bool FileStore::get(SEQNUM msgSeqNum, std::string &msg) const EXCEPT(IOException
   msg = buffer;
   delete[] buffer;
   return true;
+}
+
+void FileStore::enforCacheLimit() {
+  if (m_cacheLimit > 0 && m_offsets.size() > m_cacheLimit) {
+    // Remove oldest entries (those with lowest sequence numbers)
+    std::size_t toRemove = m_offsets.size() - m_cacheLimit;
+    NumToOffset::iterator it = m_offsets.begin();
+    for (std::size_t i = 0; i < toRemove && it != m_offsets.end(); ++i) {
+      it = m_offsets.erase(it);
+    }
+  }
 }
 
 } // namespace FIX
