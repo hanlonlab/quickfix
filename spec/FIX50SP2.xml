@@ -127,22 +127,42 @@
    <field name='UserStatus' required='N' />
    <field name='UserStatusText' required='N' />
   </message>
-  <message name='AMMRequest' msgtype='AREQ' msgcat='app'>
+  <message name='LiquidityTransaction' msgtype='LT' msgcat='app'>
    <field name='PartyID' required='Y' />
    <field name='ClOrdID' required='Y' />
-   <field name='AMMName' required='Y' />
-   <field name='AMMPool' required='Y' />
-   <field name='AMMOrderType' required='Y' />
-   <field name='AMMIsQuote' required='Y' />
-   <component name='AMMInput' required='Y' />
-   <component name='AMMOutputRequest' required='Y' />
+   <field name='ExDestination' required='Y' />
+   <field name='Pool' required='N' />
+   <field name='LiquidityAction' required='Y' />
+   <field name='LiquidityMode' required='N' />
+   <field name='QuoteOnly' required='Y' />
+   <field name='Slippage' required='N' />
+   <component name='TokensIn' required='Y' />
+   <field name='ExtraData' required='N' />
   </message>
-  <message name='AMMResponse' msgtype='ARSP' msgcat='app'>
+  <message name='LiquidityTransactionReport' msgtype='LTR' msgcat='app'>
    <field name='PartyID' required='N' />
    <field name='ClOrdID' required='Y' />
    <field name='OrdStatus' required='Y' />
-   <component name='AMMOutput' required='Y' />
-   <component name='AMMReserves' required='Y' />
+   <component name='Result' required='Y' />
+   <field name='Notes' required='N' />
+  </message>
+  <message name='SwapTransaction' msgtype='ST' msgcat='app'>
+   <field name='PartyID' required='Y' />
+   <field name='ClOrdID' required='Y' />
+   <field name='ExDestination' required='Y' />
+   <field name='Pool' required='N' />
+   <field name='SwapType' required='Y' />
+   <field name='QuoteOnly' required='Y' />
+   <field name='Slippage' required='N' />
+   <component name='SwapPath' required='Y' />
+   <field name='ExtraData' required='N' />
+  </message>
+  <message name='SwapTransactionReport' msgtype='STR' msgcat='app'>
+   <field name='PartyID' required='N' />
+   <field name='ClOrdID' required='Y' />
+   <field name='OrdStatus' required='Y' />
+   <component name='Result' required='Y' />
+   <field name='Notes' required='N' />
   </message>
  </messages>
  <trailer />
@@ -2118,25 +2138,22 @@
     <field name='DefaultVerIndicator' required='N' />
    </group>
   </component>
-  <component name='AMMInput'>
-   <group name='AMMInputLen' required='Y'>
+  <component name='TokensIn'>
+   <group name='NoTokens' required='Y'>
     <field name='TokenName' required='Y' />
     <field name='TokenQty' required='Y' />
    </group>
   </component>
-  <component name='AMMOutputRequest'>
-   <group name='AMMOutputRequestLen' required='Y'>
+  <component name='SwapPath'>
+   <group name='NoSwaps' required='Y'>
     <field name='TokenName' required='Y' />
+    <field name='TokenQty' required='N' />
+    <field name='MinTokenReceived' required='N' />
+    <field name='MaxTokenSpent' required='N' />
    </group>
   </component>
-  <component name='AMMOutput'>
-   <group name='AMMOutputLen' required='Y'>
-    <field name='TokenName' required='Y' />
-    <field name='TokenQty' required='Y' />
-   </group>
-  </component>
-  <component name='AMMReserves'>
-   <group name='AMMReservesLen' required='Y'>
+  <component name='Result'>
+   <group name='NoResults' required='Y'>
     <field name='TokenName' required='Y' />
     <field name='TokenQty' required='Y' />
    </group>
@@ -2482,8 +2499,10 @@
    <value enum='EB' description='PAY_MANAGEMENT_REPORT_ACK' />
    <value enum='DY' description='PAY_MANAGEMENT_REQUEST' />
    <value enum='DZ' description='PAY_MANAGEMENT_REQUEST_ACK' />
-   <value enum='AREQ' description='AMMREQUEST' />
-   <value enum='ARSP' description='AMMRESPONSE' />
+   <value enum='LT' description='LIQUIDITY_TRANSACTION' />
+   <value enum='LTR' description='LIQUIDITY_TRANSACTION_REPORT' />
+   <value enum='ST' description='SWAP_TRANSACTION' />
+   <value enum='STR' description='SWAP_TRANSACTION_REPORT' />
   </field>
   <field number='36' name='NewSeqNo' type='SEQNUM' />
   <field number='37' name='OrderID' type='STRING' />
@@ -14406,23 +14425,34 @@
    <value enum='2' description='CANCEL_PASSIVE' />
    <value enum='3' description='CANCEL_AGGRESSIVE_PASSIVE' />
   </field>
-  <field number='2965' name='AMMName' type='STRING' />
-  <field number='2966' name='AMMPool' type='STRING' />
-  <field number='2967' name='AMMOrderType' type='INT'>
-   <value enum='0' description='CONST' />
-   <value enum='1' description='SWAP' />
-   <value enum='2' description='MINT' />
-   <value enum='3' description='BURN' />
+  <field number='2965' name='Pool' type='STRING' />
+  <field number='2966' name='LiquidityAction' type='INT'>
+   <value enum='0' description='ADD' />
+   <value enum='1' description='REMOVE' />
   </field>
-  <field number='2968' name='AMMIsQuote' type='BOOLEAN'>
-   <value enum='N' description='EXECUTE' />
-   <value enum='Y' description='QUOTE' />
+  <field number='2967' name='LiquidityMode' type='INT'>
+   <value enum='0' description='PROPORTIONAL' />
+   <value enum='1' description='UNBALANCED' />
+   <value enum='2' description='SINGLE_TOKEN_EXACT_OUT' />
+   <value enum='3' description='DONATION' />
   </field>
-  <field number='2969' name='TokenName' type='STRING' />
-  <field number='2970' name='TokenQty' type='QTY' />
-  <field number='2971' name='AMMInputLen' type='NUMINGROUP' />
-  <field number='2972' name='AMMOutputRequestLen' type='NUMINGROUP' />
-  <field number='2973' name='AMMOutputLen' type='NUMINGROUP' />
-  <field number='2974' name='AMMReservesLen' type='NUMINGROUP' />
+  <field number='2968' name='SwapType' type='INT'>
+   <value enum='0' description='EXACT_IN' />
+   <value enum='1' description='EXACT_OUT' />
+  </field>
+  <field number='2969' name='QuoteOnly' type='INT' >
+   <value enum='Y' description='EXECUTE' />
+   <value enum='N' description='QUOTE' />
+  </field>
+  <field number='2970' name='Slippage' type='FLOAT' />
+  <field number='2971' name='ExtraData' type='STRING' />
+  <field number='2972' name='Notes' type='STRING' />
+  <field number='2973' name='TokenName' type='STRING' />
+  <field number='2974' name='TokenQty' type='QTY' />
+  <field number='2975' name='MinTokenReceived' type='QTY' />
+  <field number='2976' name='MaxTokenSpent' type='QTY' />
+  <field number='2977' name='NoTokens' type='NUMINGROUP' />
+  <field number='2978' name='NoSwaps' type='NUMINGROUP' />
+  <field number='2989' name='NoResults' type='NUMINGROUP' />
  </fields>
 </fix>
