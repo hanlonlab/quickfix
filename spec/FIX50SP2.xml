@@ -137,6 +137,8 @@
    <field name='QuoteOnly' required='Y' />
    <field name='Slippage' required='N' />
    <component name='TokensIn' required='Y' />
+   <field name='Sender' required='N' />
+   <field name='PrivKey' required='N' />
    <field name='ExtraData' required='N' />
   </message>
   <message name='LiquidityTransactionReport' msgtype='LTR' msgcat='app'>
@@ -155,6 +157,8 @@
    <field name='QuoteOnly' required='Y' />
    <field name='Slippage' required='N' />
    <component name='SwapPath' required='Y' />
+   <field name='Sender' required='N' />
+   <field name='PrivKey' required='N' />
    <field name='ExtraData' required='N' />
   </message>
   <message name='SwapTransactionReport' msgtype='STR' msgcat='app'>
@@ -14454,5 +14458,7 @@
   <field number='2977' name='NoTokens' type='NUMINGROUP' />
   <field number='2978' name='NoSwaps' type='NUMINGROUP' />
   <field number='2989' name='NoResults' type='NUMINGROUP' />
+  <field number='2990' name='Sender' type='STRING' />
+  <field number='2991' name='PrivKey' type='STRING' />
  </fields>
 </fix>
