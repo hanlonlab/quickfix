@@ -14444,7 +14444,7 @@
    <value enum='0' description='EXACT_IN' />
    <value enum='1' description='EXACT_OUT' />
   </field>
-  <field number='2969' name='QuoteOnly' type='INT' >
+  <field number='2969' name='QuoteOnly' type='CHAR' >
    <value enum='Y' description='EXECUTE' />
    <value enum='N' description='QUOTE' />
   </field>

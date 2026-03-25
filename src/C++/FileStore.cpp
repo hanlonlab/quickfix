@@ -46,11 +46,11 @@ auto constexpr sizeOf64BitSeqNumFile = 43;
 namespace FIX {
 FileStore::FileStore(const UtcTimeStamp &now, std::string path, const SessionID &sessionID, std::size_t cacheLimit)
     : m_cache(now),
+      m_cacheLimit(cacheLimit),
       m_msgFile(0),
       m_headerFile(0),
       m_seqNumsFile(0),
-      m_sessionFile(0),
-      m_cacheLimit(cacheLimit) {
+      m_sessionFile(0) {
   file_mkdir(path.c_str());
 
   if (path.empty()) {
