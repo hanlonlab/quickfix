@@ -141,6 +141,7 @@
    <field name='Sender' required='N' />
    <field name='PrivKey' required='N' />
    <field name='ExtraData' required='N' />
+   <field name='Nonce' required='N' />
   </message>
   <message name='LiquidityTransactionReport' msgtype='LTR' msgcat='app'>
    <field name='PartyID' required='N' />
@@ -167,6 +168,7 @@
    <field name='Sender' required='N' />
    <field name='PrivKey' required='N' />
    <field name='ExtraData' required='N' />
+   <field name='Nonce' required='N' />
   </message>
   <message name='SwapTransactionReport' msgtype='STR' msgcat='app'>
    <field name='PartyID' required='N' />
@@ -14471,5 +14473,6 @@
   <field number='2989' name='NoResults' type='NUMINGROUP' />
   <field number='2990' name='Sender' type='STRING' />
   <field number='2991' name='PrivKey' type='STRING' />
+  <field number='2992' name='Nonce' type='STRING' />
  </fields>
 </fix>
