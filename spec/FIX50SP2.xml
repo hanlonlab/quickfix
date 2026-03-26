@@ -146,6 +146,9 @@
   <message name='LiquidityTransactionReport' msgtype='LTR' msgcat='app'>
    <field name='PartyID' required='N' />
    <field name='ClOrdID' required='Y' />
+   <field name='ExecID' required='Y' />
+   <field name='ExDestination' required='Y' />
+   <field name='Pool' required='N' />
    <field name='OrdStatus' required='Y' />
    <field name='LiquidityAction' required='Y' />
    <field name='LiquidityMode' required='Y' />
@@ -173,6 +176,9 @@
   <message name='SwapTransactionReport' msgtype='STR' msgcat='app'>
    <field name='PartyID' required='N' />
    <field name='ClOrdID' required='Y' />
+   <field name='ExecID' required='Y' />
+   <field name='ExDestination' required='Y' />
+   <field name='Pool' required='N' />
    <field name='OrdStatus' required='Y' />
    <field name='SwapType' required='Y' />
    <field name='QuoteOnly' required='Y' />
