@@ -137,6 +137,7 @@
    <field name='QuoteOnly' required='Y' />
    <field name='Slippage' required='N' />
    <component name='TokensIn' required='Y' />
+   <field name='TransactTime' required='N' />
    <field name='Sender' required='N' />
    <field name='PrivKey' required='N' />
    <field name='ExtraData' required='N' />
@@ -145,7 +146,12 @@
    <field name='PartyID' required='N' />
    <field name='ClOrdID' required='Y' />
    <field name='OrdStatus' required='Y' />
+   <field name='LiquidityAction' required='Y' />
+   <field name='LiquidityMode' required='Y' />
+   <field name='QuoteOnly' required='Y' />
    <component name='Result' required='Y' />
+   <field name='TransactTime' required='N' />
+   <field name='EffectiveTime' required='N' />
    <field name='Notes' required='N' />
   </message>
   <message name='SwapTransaction' msgtype='ST' msgcat='app'>
@@ -157,6 +163,7 @@
    <field name='QuoteOnly' required='Y' />
    <field name='Slippage' required='N' />
    <component name='SwapPath' required='Y' />
+   <field name='TransactTime' required='N' />
    <field name='Sender' required='N' />
    <field name='PrivKey' required='N' />
    <field name='ExtraData' required='N' />
@@ -165,7 +172,11 @@
    <field name='PartyID' required='N' />
    <field name='ClOrdID' required='Y' />
    <field name='OrdStatus' required='Y' />
+   <field name='SwapType' required='Y' />
+   <field name='QuoteOnly' required='Y' />
    <component name='Result' required='Y' />
+   <field name='TransactTime' required='N' />
+   <field name='EffectiveTime' required='N' />
    <field name='Notes' required='N' />
   </message>
  </messages>
@@ -14444,9 +14455,9 @@
    <value enum='0' description='EXACT_IN' />
    <value enum='1' description='EXACT_OUT' />
   </field>
-  <field number='2969' name='QuoteOnly' type='CHAR' >
-   <value enum='Y' description='EXECUTE' />
-   <value enum='N' description='QUOTE' />
+  <field number='2969' name='QuoteOnly' type='BOOLEAN' >
+   <value enum='Y' description='YES' />
+   <value enum='N' description='NO' />
   </field>
   <field number='2970' name='Slippage' type='FLOAT' />
   <field number='2971' name='ExtraData' type='STRING' />
