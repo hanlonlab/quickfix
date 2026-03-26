@@ -234,6 +234,8 @@ std::size_t FileStoreFactory::getCacheLimit(const FIX::SessionID &sessionID) con
   }
 }
 
+void FileStoreFactory::destroy(MessageStore *pStore) { delete pStore; }
+
 MessageStore *FileStoreFactory::create(const UtcTimeStamp &now, const SessionID &sessionID) {
   if (m_path.size()) {
     return new FileStore(now, m_path, sessionID, m_cacheLimit);
