@@ -14448,7 +14448,6 @@
    <value enum='2' description='CANCEL_PASSIVE' />
    <value enum='3' description='CANCEL_AGGRESSIVE_PASSIVE' />
   </field>
-  <field number='2965' name='Pool' type='STRING' />
   <field number='2966' name='LiquidityAction' type='INT'>
    <value enum='0' description='ADD' />
    <value enum='1' description='REMOVE' />
