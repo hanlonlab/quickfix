@@ -102,6 +102,7 @@
    <field name='SettlPrice' required='N' />
    <field name='PriorSettlPrice' required='N' />
    <field name='PriceDelta' required='N' />
+   <field name='ClearingBusinessDate' required='N' />
    <component name='Parties' required='Y' />
    <component name='PositionQty' required='N' />
    <component name='PositionAmountData' required='N' />
