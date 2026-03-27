@@ -51,6 +51,7 @@
   </message>
   <message name='Quote' msgtype='S' msgcat='app'>
    <field name='QuoteID' required='Y' />
+   <field name='QuoteType' required='N' />
    <component name='Parties' required='N' />
    <component name='Instrument' required='Y' />
    <field name='BidPx' required='N' />
