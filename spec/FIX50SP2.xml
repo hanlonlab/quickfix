@@ -2,8 +2,9 @@
  <header />
  <messages>
   <message name='Advertisement' msgtype='7' msgcat='app'>
-   <component name='Instrument' required='Y' />
    <field name='AdvId' required='Y' />
+   <field name='AdvTransType' required='Y' />
+   <component name='Instrument' required='Y' />
    <field name='AdvSide' required='Y' />
    <field name='Quantity' required='Y' />
    <field name='Price' required='N' />
