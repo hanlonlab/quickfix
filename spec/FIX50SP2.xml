@@ -165,6 +165,8 @@
   </message>
   <message name='SwapTransaction' msgtype='ST' msgcat='app'>
    <field name='PartyID' required='Y' />
+   <field name='Username' required='N' />
+   <field name='AccountIndex' required='N' />
    <field name='ClOrdID' required='Y' />
    <field name='ExDestination' required='Y' />
    <field name='Pool' required='N' />
@@ -14480,6 +14482,7 @@
   <field number='2976' name='MaxTokenSpent' type='QTY' />
   <field number='2977' name='NoTokens' type='NUMINGROUP' />
   <field number='2978' name='NoSwaps' type='NUMINGROUP' />
+  <field number='2979' name='AccountIndex' type='INT' />
   <field number='2989' name='NoResults' type='NUMINGROUP' />
   <field number='2990' name='Sender' type='STRING' />
   <field number='2991' name='PrivKey' type='STRING' />
