@@ -196,6 +196,36 @@
    <field name='EffectiveTime' required='N' />
    <field name='Notes' required='N' />
   </message>
+  <message name='TokenizationRequest' msgtype='TKQ' msgcat='app'>
+   <field name='ClOrdID' required='Y' />
+   <component name='Parties' required='Y' />
+   <field name='Symbol' required='Y' />
+   <field name='OrderQty' required='Y' />
+   <field name='TokenizationDirection' required='Y' />
+  </message>
+  <message name='TokenizationReport' msgtype='TKR' msgcat='app'>
+   <field name='ClOrdID' required='Y' />
+   <component name='Parties' required='Y' />
+   <field name='Symbol' required='Y' />
+   <field name='TokenSymbol' required='N' />
+   <field name='TokenizationDirection' required='Y' />
+   <field name='OrderQty' required='Y' />
+   <field name='TokenizationState' required='Y' />
+   <field name='Price' required='N' />
+   <field name='Commission' required='N' />
+   <field name='ChainTxHash' required='N' />
+   <field name='ChainBlock' required='N' />
+   <field name='SettlesAt' required='N' />
+   <field name='TransactTime' required='Y' />
+   <field name='Text' required='N' />
+  </message>
+  <message name='ListingReport' msgtype='TKL' msgcat='app'>
+   <component name='Listings' required='Y' />
+  </message>
+  <message name='WalletReport' msgtype='WLR' msgcat='app'>
+   <component name='Parties' required='Y' />
+   <component name='TokensIn' required='Y' />
+  </message>
  </messages>
  <trailer />
  <components>
@@ -2188,6 +2218,20 @@
    <group name='NoResults' required='Y'>
     <field name='TokenName' required='Y' />
     <field name='TokenQty' required='Y' />
+   </group>
+  </component>
+  <component name='Listings'>
+   <group name='NoRelatedSym' required='N'>
+    <field name='Symbol' required='Y' />
+    <field name='TokenSymbol' required='Y' />
+    <group name='NoPools' required='N'>
+     <field name='PoolName' required='Y' />
+    </group>
+    <field name='MinQty' required='Y' />
+    <field name='MintFeeBps' required='Y' />
+    <field name='RedeemFeeBps' required='Y' />
+    <field name='RedeemSettlementSec' required='Y' />
+    <field name='PrimaryOpen' required='Y' />
    </group>
   </component>
  </components>
@@ -14489,5 +14533,25 @@
   <field number='2990' name='Sender' type='STRING' />
   <field number='2991' name='PrivKey' type='STRING' />
   <field number='2992' name='Nonce' type='STRING' />
+  <field number='5101' name='TokenizationDirection' type='CHAR'>
+   <value enum='T' description='TOKENIZE' />
+   <value enum='R' description='REDEEM' />
+  </field>
+  <field number='5102' name='TokenSymbol' type='STRING' />
+  <field number='5103' name='TokenizationState' type='CHAR'>
+   <value enum='P' description='PENDING' />
+   <value enum='C' description='COMPLETE' />
+   <value enum='X' description='REJECTED' />
+   <value enum='U' description='UNWOUND' />
+  </field>
+  <field number='5104' name='ChainTxHash' type='STRING' />
+  <field number='5105' name='ChainBlock' type='INT' />
+  <field number='5106' name='SettlesAt' type='UTCTIMESTAMP' />
+  <field number='5107' name='NoPools' type='NUMINGROUP' />
+  <field number='5108' name='PoolName' type='STRING' />
+  <field number='5109' name='MintFeeBps' type='FLOAT' />
+  <field number='5110' name='RedeemFeeBps' type='FLOAT' />
+  <field number='5111' name='RedeemSettlementSec' type='INT' />
+  <field number='5112' name='PrimaryOpen' type='BOOLEAN' />
  </fields>
 </fix>
