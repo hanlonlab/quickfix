@@ -134,6 +134,7 @@
   </message>
   <message name='LiquidityTransaction' msgtype='LT' msgcat='app'>
    <field name='PartyID' required='Y' />
+   <field name='Username' required='N' />
    <field name='AccountIndex' required='N' />
    <field name='ClOrdID' required='Y' />
    <field name='ExDestination' required='Y' />
