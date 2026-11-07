@@ -24,12 +24,25 @@
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4503 4355 4786 4290)
+#else
+#include <unistd.h>
 #endif
 
 #include "MessageStore.h"
 #include "SessionSettings.h"
 #include <fstream>
 #include <string>
+
+#ifdef _MSC_VER
+// off_t is only 32 bits wide on MSVC, so use 64-bit offsets and functions explicitly
+typedef __int64 file_offset_t;
+#define FILE_FSEEK _fseeki64
+#define FILE_FTELL _ftelli64
+#else
+typedef off_t file_offset_t;
+#define FILE_FSEEK fseeko
+#define FILE_FTELL ftello
+#endif
 
 namespace FIX {
 class Session;
@@ -40,13 +53,20 @@ public:
   FileStoreFactory(const SessionSettings &settings)
       : m_settings(settings) {};
   FileStoreFactory(const std::string &path)
-      : m_path(path) {};
+      : m_path(path),
+        m_cacheLimit(0) {};
+  FileStoreFactory(const std::string &path, std::size_t cacheLimit)
+      : m_path(path),
+        m_cacheLimit(cacheLimit) {};
 
   MessageStore *create(const UtcTimeStamp &, const SessionID &);
   void destroy(MessageStore *);
 
 private:
+  std::size_t getCacheLimit(const SessionID &sessionID) const;
+
   std::string m_path;
+  std::size_t m_cacheLimit;
   SessionSettings m_settings;
 };
 /*! @} */
@@ -79,7 +99,7 @@ private:
  */
 class FileStore : public MessageStore {
 public:
-  FileStore(const UtcTimeStamp &now, std::string, const SessionID &sessionID);
+  FileStore(const UtcTimeStamp &now, std::string, const SessionID &sessionID, std::size_t cacheLimit = 0);
   virtual ~FileStore();
 
   bool set(SEQNUM, const std::string &) EXCEPT(IOException);
@@ -98,11 +118,7 @@ public:
   void refresh() EXCEPT(IOException);
 
 private:
-#ifdef _MSC_VER
-  typedef std::pair<long, std::size_t> OffsetSize;
-#else
-  typedef std::pair<long, std::size_t> OffsetSize;
-#endif
+  typedef std::pair<file_offset_t, std::size_t> OffsetSize;
   typedef std::map<SEQNUM, OffsetSize> NumToOffset;
 
   void open(bool deleteFile);
@@ -110,11 +126,13 @@ private:
   bool readFromFile(int offset, int size, std::string &msg);
   void setSeqNum();
   void setSession();
+  void enforCacheLimit();
 
   bool get(SEQNUM, std::string &) const EXCEPT(IOException);
 
   MemoryStore m_cache;
   NumToOffset m_offsets;
+  std::size_t m_cacheLimit;
 
   std::string m_msgFileName;
   std::string m_headerFileName;
