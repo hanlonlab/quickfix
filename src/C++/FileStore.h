@@ -33,6 +33,17 @@
 #include <fstream>
 #include <string>
 
+#ifdef _MSC_VER
+// off_t is only 32 bits wide on MSVC, so use 64-bit offsets and functions explicitly
+typedef __int64 file_offset_t;
+#define FILE_FSEEK _fseeki64
+#define FILE_FTELL _ftelli64
+#else
+typedef off_t file_offset_t;
+#define FILE_FSEEK fseeko
+#define FILE_FTELL ftello
+#endif
+
 namespace FIX {
 class Session;
 
@@ -107,11 +118,7 @@ public:
   void refresh() EXCEPT(IOException);
 
 private:
-#ifdef _MSC_VER
-  typedef std::pair<off_t, std::size_t> OffsetSize;
-#else
-  typedef std::pair<off_t, std::size_t> OffsetSize;
-#endif
+  typedef std::pair<file_offset_t, std::size_t> OffsetSize;
   typedef std::map<SEQNUM, OffsetSize> NumToOffset;
 
   void open(bool deleteFile);

@@ -173,7 +173,7 @@ void FileStore::populateCache() {
   FILE *headerFile = file_fopen(m_headerFileName.c_str(), "r+");
   if (headerFile) {
     SEQNUM msgSeqNum;
-    off_t offset;
+    file_offset_t offset;
     std::size_t size;
 
     while (FILE_FSCANF(headerFile, "%" SCNu64 ",%lld,%zu ", &msgSeqNum, (long long *)&offset, &size) == 3) {
@@ -250,14 +250,14 @@ MessageStore *FileStoreFactory::create(const UtcTimeStamp &now, const SessionID 
 }
 
 bool FileStore::set(SEQNUM msgSeqNum, const std::string &msg) EXCEPT(IOException) {
-  if (fseeko(m_msgFile, 0, SEEK_END)) {
+  if (FILE_FSEEK(m_msgFile, 0, SEEK_END)) {
     throw IOException("Cannot seek to end of " + m_msgFileName);
   }
-  if (fseeko(m_headerFile, 0, SEEK_END)) {
+  if (FILE_FSEEK(m_headerFile, 0, SEEK_END)) {
     throw IOException("Cannot seek to end of " + m_headerFileName);
   }
 
-  off_t offset = ftello(m_msgFile);
+  file_offset_t offset = FILE_FTELL(m_msgFile);
   if (offset < 0) {
     throw IOException("Unable to get file pointer position from " + m_msgFileName);
   }
@@ -379,7 +379,7 @@ bool FileStore::get(SEQNUM msgSeqNum, std::string &msg) const EXCEPT(IOException
     }
 
     SEQNUM seqNum;
-    off_t f_offset;
+    file_offset_t f_offset;
     std::size_t size;
     bool found = false;
 
@@ -397,7 +397,7 @@ bool FileStore::get(SEQNUM msgSeqNum, std::string &msg) const EXCEPT(IOException
     }
   }
 
-  if (fseeko(m_msgFile, offset.first, SEEK_SET)) {
+  if (FILE_FSEEK(m_msgFile, offset.first, SEEK_SET)) {
     throw IOException("Unable to seek in file " + m_msgFileName);
   }
   char *buffer = new char[offset.second + 1];

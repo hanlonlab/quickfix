@@ -27,6 +27,7 @@
    <field name='LastMkt' required='N' />
    <field name='LeavesQty' required='Y' />
    <field name='CumQty' required='Y' />
+   <field name='AvgPx' required='N' />
    <field name='TransactTime' required='N' />
    <component name='TrdRegTimestamps' required='N' />
   </message>
@@ -37,6 +38,8 @@
   <message name='NewOrderSingle' msgtype='D' msgcat='app'>
    <field name='ClOrdID' required='Y' />
    <component name='Parties' required='N' />
+   <field name='HandlInst' required='N' />
+   <component name='TrdgSesGrp' required='N' />
    <component name='Instrument' required='Y' />
    <field name='Side' required='Y' />
    <field name='TransactTime' required='Y' />
@@ -325,6 +328,12 @@
     <field name='NBBOPrice' required='N' />
     <field name='NBBOQty' required='N' />
     <field name='NBBOSource' required='N' />
+   </group>
+  </component>
+  <component name='TrdgSesGrp'>
+   <group name='NoTradingSessions' required='N'>
+    <field name='TradingSessionID' required='N' />
+    <field name='TradingSessionSubID' required='N' />
    </group>
   </component>
   <component name='UnderlyingStipulations'>
